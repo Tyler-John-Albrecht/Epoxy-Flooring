@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Client Onboarding — Aura Resin & Stone</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500;1,600&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+:root {
+  --gold: #D4AF37;
+  --gold-light: #E8CC6A;
+  --gold-dim: rgba(212,175,55,0.12);
+  --gold-border: rgba(212,175,55,0.25);
+  --charcoal: #1C1C1A;
+  --charcoal-mid: #232320;
+  --charcoal-light: #2E2E2B;
+  --charcoal-card: #252523;
+  --mist: #C8C4BB;
+  --mist-dim: rgba(200,196,187,0.55);
+  --mist-faint: rgba(200,196,187,0.25);
+  --error: #C0392B;
+  --success: #2ECC71;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--charcoal);
+  color: var(--mist);
+  font-family: 'Montserrat', sans-serif;
+  min-height: 100vh;
+  cursor: none;
+}
+
+/* Cursor */
+.cursor { position: fixed; width: 10px; height: 10px; background: var(--gold); border-radius: 50%; pointer-events: none; z-index: 99999; transform: translate(-50%,-50%); mix-blend-mode: difference; transition: transform 0.1s; }
+.cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(212,175,55,0.5); border-radius: 50%; pointer-events: none; z-index: 99998; transform: translate(-50%,-50%); transition: all 0.18s ease; }
+.cursor-ring.expand { width: 54px; height: 54px; border-color: rgba(212,175,55,0.8); }
+
+/* Header */
+.q-header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 900;
+  background: rgba(28,28,26,0.94);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(212,175,55,0.08);
+  padding: 1.2rem 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.q-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.2rem;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+}
+.q-logo em { font-style: italic; }
+.q-header-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--mist-dim);
+}
+
+/* Progress bar */
+.progress-bar-wrap {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: rgba(212,175,55,0.08);
+  z-index: 1000;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: linear-gradient(to right, var(--gold), var(--gold-light));
+  width: 0%;
+  transition: width 0.4s ease;
+}
+
+/* Step indicators */
+.step-nav {
+  position: fixed;
+  right: 2.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  z-index: 800;
+}
+.step-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(212,175,55,0.2);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.step-dot.active {
+  background: var(--gold);
+  transform: scale(1.5);
+}
+.step-dot.done {
+  background: rgba(212,175,55,0.5);
+}
+.step-dot-label {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.5rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mist-dim);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+.step-dot:hover .step-dot-label { opacity: 1; }
+
+/* Main layout */
+.q-main {
+  padding-top: 80px;
+  min-height: 100vh;
+}
+
+/* Sections */
+.q-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6rem 2rem;
+  position: relative;
+  border-bottom: 1px solid rgba(212,175,55,0.04);
+}
+.q-section:nth-child(even) {
+  background: var(--charcoal-mid);
+}
+
+/* Ornament */
+.ornament {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+.ornament-line { height: 1px; width: 50px; background: linear-gradient(to right, transparent, var(--gold)); }
+.ornament-line.right { background: linear-gradient(to left, transparent, var(--gold)); }
+.ornament-diamond { width: 5px; height: 5px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+/* Card */
+.q-card {
+  background: var(--charcoal-card);
+  border: 1px solid rgba(212,175,55,0.1);
+  padding: 3.5rem;
+  width: 100%;
+  max-width: 780px;
+  position: relative;
+  transition: border-color 0.4s ease;
+}
+.q-card::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  border: 1px solid transparent;
+  transition: border-color 0.4s ease;
+  pointer-events: none;
+}
+
+.section-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 5rem;
+  font-weight: 300;
+  color: rgba(212,175,55,0.06);
+  line-height: 1;
+  position: absolute;
+  top: 1.5rem;
+  right: 2rem;
+  user-select: none;
+}
+
+.q-eyebrow {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.7rem;
+}
+.q-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+  font-weight: 300;
+  color: #F0EBE0;
+  line-height: 1.2;
+  margin-bottom: 0.7rem;
+}
+.q-heading em { font-style: italic; color: var(--gold); }
+.q-subtext {
+  font-size: 0.7rem;
+  font-weight: 300;
+  line-height: 1.9;
+  color: var(--mist-dim);
+  letter-spacing: 0.04em;
+  margin-bottom: 2.5rem;
+}
+
+/* Form fields */
+.field-group {
+  margin-bottom: 1.8rem;
+}
+.field-group:last-of-type { margin-bottom: 0; }
+
+.field-label {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.6rem;
+}
+.field-hint {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--mist-dim);
+  margin-bottom: 0.8rem;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="url"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  background: rgba(28,28,26,0.7);
+  border: 1px solid rgba(212,175,55,0.18);
+  color: #F0EBE0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  padding: 0.9rem 1.1rem;
+  outline: none;
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: var(--gold);
+  background: rgba(28,28,26,0.9);
+  box-shadow: 0 0 0 3px rgba(212,175,55,0.07);
+}
+input::placeholder, textarea::placeholder {
+  color: var(--mist-faint);
+  font-weight: 300;
+}
+textarea { resize: vertical; min-height: 110px; line-height: 1.8; }
+
+select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4AF37' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+select option {
+  background: #1C1C1A;
+  color: #F0EBE0;
+}
+
+/* Two-column grid for short fields */
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.8rem;
+}
+.field-row .field-group { margin-bottom: 0; }
+
+/* Checkbox / radio pills */
+.pill-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+.pill-label {
+  position: relative;
+  cursor: pointer;
+}
+.pill-label input {
+  position: absolute;
+  opacity: 0;
+  width: 0; height: 0;
+}
+.pill-label span {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mist-dim);
+  border: 1px solid rgba(212,175,55,0.2);
+  padding: 0.5rem 1rem;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.pill-label input:checked + span {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+.pill-label:hover span {
+  border-color: rgba(212,175,55,0.5);
+  color: var(--mist);
+}
+
+/* Divider */
+.field-divider {
+  height: 1px;
+  background: rgba(212,175,55,0.08);
+  margin: 2.2rem 0;
+}
+
+/* Section footer nav */
+.q-nav-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(212,175,55,0.08);
+}
+.btn-next {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  background: var(--gold);
+  border: none;
+  padding: 0.9rem 2rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.btn-next:hover { background: var(--gold-light); transform: translateY(-1px); }
+.btn-back {
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--mist-dim);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: color 0.3s ease;
+}
+.btn-back:hover { color: var(--gold); }
+.btn-submit {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--charcoal);
+  background: var(--gold);
+  border: none;
+  padding: 1rem 2.5rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+}
+.btn-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+/* Step count */
+.step-count {
+  font-size: 0.55rem;
+  letter-spacing: 0.25em;
+  color: var(--mist-faint);
+}
+.step-count strong { color: var(--gold); }
+
+/* Success screen */
+#success-screen {
+  display: none;
+  min-height: 100vh;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+  flex-direction: column;
+  gap: 2rem;
+}
+.success-check {
+  width: 60px;
+  height: 60px;
+  border: 1px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+  color: var(--gold);
+  font-size: 1.5rem;
+}
+.success-heading {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 300;
+  color: #F0EBE0;
+  line-height: 1.2;
+}
+.success-heading em { font-style: italic; color: var(--gold); }
+
+/* Summary output */
+#summary-output {
+  display: none;
+  max-width: 780px;
+  margin: 0 auto 4rem;
+  padding: 3rem;
+  background: var(--charcoal-card);
+  border: 1px solid rgba(212,175,55,0.15);
+  font-size: 0.72rem;
+  line-height: 1.9;
+  letter-spacing: 0.04em;
+  color: var(--mist);
+  white-space: pre-wrap;
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Copy button */
+.btn-copy {
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid var(--gold-border);
+  background: none;
+  padding: 0.8rem 1.8rem;
+  cursor: pointer;
+  font-family: 'Montserrat', sans-serif;
+  transition: background 0.3s, color 0.3s;
+  margin-top: 1rem;
+}
+.btn-copy:hover { background: var(--gold-dim); }
+
+/* Noise */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99997;
+  opacity: 0.016;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+}
+
+@media (max-width: 700px) {
+  .q-header { padding: 1rem 1.2rem; }
+  .q-card { padding: 2rem 1.5rem; }
+  .field-row { grid-template-columns: 1fr; }
+  .step-nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- Progress Bar -->
+<div class="progress-bar-wrap">
+  <div class="progress-bar-fill" id="progress-fill"></div>
+</div>
+
+<!-- Header -->
+<header class="q-header">
+  <div class="q-logo">Aura <em>Resin &amp; Stone</em></div>
+  <div class="q-header-label">Client Onboarding Questionnaire</div>
+</header>
+
+<!-- Step Dots -->
+<nav class="step-nav" id="step-nav" aria-label="Section navigation"></nav>
+
+<!-- Main Form -->
+<main class="q-main">
+<form id="q-form" novalidate>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SECTION 1 · Business Identity                           -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="q-section" id="sec-1" data-section="1" data-label="Identity">
+    <div class="q-card">
+      <div class="section-num">01</div>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line right"></div>
+      </div>
+      <div class="q-eyebrow">Section 01 — Business Identity</div>
+      <h2 class="q-heading">Who <em>Are You?</em></h2>
+      <p class="q-subtext">This information populates your brand name, tagline, founding year, and contact details throughout the site.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="biz-name">Business Name</label>
+          <input type="text" id="biz-name" name="biz_name" placeholder="e.g. Atlas Epoxy Co." required />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="biz-year">Year Founded</label>
+          <input type="number" id="biz-year" name="biz_year" placeholder="e.g. 2018" min="1980" max="2025" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="biz-tagline">One-Line Tagline</label>
+        <span class="field-hint">Used in the preloader and footer. Keep it short and distinct.</span>
+        <input type="text" id="biz-tagline" name="biz_tagline" placeholder="e.g. Precision Poured. Built to Last." />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="biz-description">Brand Description</label>
+        <span class="field-hint">2–3 sentences about who you are and what sets you apart. Used in the footer and intro statement.</span>
+        <textarea id="biz-description" name="biz_description" placeholder="We are a boutique epoxy flooring studio specializing in..."></textarea>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="biz-phone">Phone Number</label>
+          <input type="tel" id="biz-phone" name="biz_phone" placeholder="(555) 000-0000" required />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="biz-email">Business Email</label>
+          <input type="email" id="biz-email" name="biz_email" placeholder="hello@yourbusiness.com" required />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="biz-website">Current Website (if any)</label>
+        <input type="url" id="biz-website" name="biz_website" placeholder="https://yourbusiness.com" />
+      </div>
+
+      <div class="q-nav-row">
+        <span class="step-count">Step <strong>1</strong> of 6</span>
+        <button type="button" class="btn-next" onclick="goTo(2)">Next Section <span style="font-size:0.9em;">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SECTION 2 · Services Offered                            -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="q-section" id="sec-2" data-section="2" data-label="Services">
+    <div class="q-card">
+      <div class="section-num">02</div>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line right"></div>
+      </div>
+      <div class="q-eyebrow">Section 02 — Services</div>
+      <h2 class="q-heading">What Do <em>You Install?</em></h2>
+      <p class="q-subtext">Select all services you offer. These populate the Services/Disciplines section with accurate copy and card titles.</p>
+
+      <div class="field-group">
+        <label class="field-label">Primary Services Offered</label>
+        <span class="field-hint">Select all that apply.</span>
+        <div class="pill-group">
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="garage_epoxy" /><span>Garage Epoxy</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="metallic_epoxy" /><span>Metallic Epoxy</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="polyaspartic" /><span>Polyaspartic Coatings</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="flake_broadcast" /><span>Flake / Broadcast</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="commercial" /><span>Commercial Floors</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="outdoor" /><span>Outdoor / Patio</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="basement" /><span>Basement Floors</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="polished_concrete" /><span>Polished Concrete</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="retail" /><span>Retail / Hospitality</span></label>
+          <label class="pill-label"><input type="checkbox" name="svc[]" value="industrial" /><span>Industrial</span></label>
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Service 1 — Title &amp; Description</label>
+        <span class="field-hint">Your most popular or flagship service. Used for the first service card on the site.</span>
+        <input type="text" name="svc1_title" placeholder="e.g. Luxury Garage Coatings" style="margin-bottom: 0.8rem;" />
+        <textarea name="svc1_desc" placeholder="Describe this service in 2–3 sentences as it should appear on the site..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Service 2 — Title &amp; Description</label>
+        <input type="text" name="svc2_title" placeholder="e.g. Commercial Epoxy Systems" style="margin-bottom: 0.8rem;" />
+        <textarea name="svc2_desc" placeholder="Describe this service..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Service 3 — Title &amp; Description</label>
+        <input type="text" name="svc3_title" placeholder="e.g. Bespoke Metallic Artistry" style="margin-bottom: 0.8rem;" />
+        <textarea name="svc3_desc" placeholder="Describe this service..."></textarea>
+      </div>
+
+      <div class="q-nav-row">
+        <button type="button" class="btn-back" onclick="goTo(1)"><span style="font-size:0.9em;">←</span> Back</button>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <span class="step-count">Step <strong>2</strong> of 6</span>
+          <button type="button" class="btn-next" onclick="goTo(3)">Next Section <span style="font-size:0.9em;">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SECTION 3 · Credentials & Stats                         -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="q-section" id="sec-3" data-section="3" data-label="Credentials">
+    <div class="q-card">
+      <div class="section-num">03</div>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line right"></div>
+      </div>
+      <div class="q-eyebrow">Section 03 — Credentials</div>
+      <h2 class="q-heading">Your <em>Proof Points.</em></h2>
+      <p class="q-subtext">These numbers populate the stats row and build trust signals throughout the page.</p>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="stat-projects">Projects Completed</label>
+          <input type="number" id="stat-projects" name="stat_projects" placeholder="e.g. 400" min="1" />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="stat-years">Years in Business</label>
+          <input type="number" id="stat-years" name="stat_years" placeholder="e.g. 12" min="1" />
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label" for="stat-warranty">Coating Warranty</label>
+          <input type="text" id="stat-warranty" name="stat_warranty" placeholder="e.g. 5-Year, Lifetime" />
+        </div>
+        <div class="field-group">
+          <label class="field-label" for="stat-satisfaction">Satisfaction Claim</label>
+          <input type="text" id="stat-satisfaction" name="stat_satisfaction" placeholder="e.g. 100% Guarantee" />
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Certifications &amp; Affiliations</label>
+        <span class="field-hint">Select any that apply — these may appear as trust badges.</span>
+        <div class="pill-group">
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="epoxy_specialist" /><span>Certified Epoxy Specialist</span></label>
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="icri" /><span>ICRI Member</span></label>
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="licensed_bonded" /><span>Licensed &amp; Bonded</span></label>
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="insured" /><span>Fully Insured</span></label>
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="sherwin" /><span>Sherwin-Williams Certified</span></label>
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="sika" /><span>Sika Certified Installer</span></label>
+          <label class="pill-label"><input type="checkbox" name="cert[]" value="bbb" /><span>BBB Accredited</span></label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="service-area">Service Area</label>
+        <span class="field-hint">City/region or states served. Used in the footer and CTA section.</span>
+        <input type="text" id="service-area" name="service_area" placeholder="e.g. Dallas-Fort Worth metro and surrounding Texas markets" />
+      </div>
+
+      <div class="q-nav-row">
+        <button type="button" class="btn-back" onclick="goTo(2)"><span style="font-size:0.9em;">←</span> Back</button>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <span class="step-count">Step <strong>3</strong> of 6</span>
+          <button type="button" class="btn-next" onclick="goTo(4)">Next Section <span style="font-size:0.9em;">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SECTION 4 · Process                                     -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="q-section" id="sec-4" data-section="4" data-label="Process">
+    <div class="q-card">
+      <div class="section-num">04</div>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line right"></div>
+      </div>
+      <div class="q-eyebrow">Section 04 — Your Process</div>
+      <h2 class="q-heading">How Do You <em>Work?</em></h2>
+      <p class="q-subtext">Describe your installation process. These become the 4 numbered steps in the Process section of the site.</p>
+
+      <div class="field-group">
+        <label class="field-label">Step 1 — Title</label>
+        <input type="text" name="step1_title" placeholder="e.g. Moisture Assessment & Diagnostics" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Step 1 — Description</label>
+        <textarea name="step1_desc" placeholder="Describe what happens in this first step..."></textarea>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Step 2 — Title</label>
+        <input type="text" name="step2_title" placeholder="e.g. Diamond Grinding & Surface Profiling" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Step 2 — Description</label>
+        <textarea name="step2_desc" placeholder="Describe step 2..."></textarea>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Step 3 — Title</label>
+        <input type="text" name="step3_title" placeholder="e.g. Precision Resin Application" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Step 3 — Description</label>
+        <textarea name="step3_desc" placeholder="Describe step 3..."></textarea>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Step 4 — Title</label>
+        <input type="text" name="step4_title" placeholder="e.g. Urethane Topcoat Sealing" />
+      </div>
+      <div class="field-group">
+        <label class="field-label">Step 4 — Description</label>
+        <textarea name="step4_desc" placeholder="Describe step 4..."></textarea>
+      </div>
+
+      <div class="q-nav-row">
+        <button type="button" class="btn-back" onclick="goTo(3)"><span style="font-size:0.9em;">←</span> Back</button>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <span class="step-count">Step <strong>4</strong> of 6</span>
+          <button type="button" class="btn-next" onclick="goTo(5)">Next Section <span style="font-size:0.9em;">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SECTION 5 · Gallery & Portfolio                         -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="q-section" id="sec-5" data-section="5" data-label="Gallery">
+    <div class="q-card">
+      <div class="section-num">05</div>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line right"></div>
+      </div>
+      <div class="q-eyebrow">Section 05 — Portfolio &amp; Gallery</div>
+      <h2 class="q-heading">Your <em>Best Work.</em></h2>
+      <p class="q-subtext">Describe your 4 featured gallery projects. These populate the gallery cards with location labels and project titles.</p>
+
+      <div class="field-group">
+        <label class="field-label">Gallery Image 1 — Project Title</label>
+        <span class="field-hint">This is the tall, hero gallery card (top-left).</span>
+        <input type="text" name="gal1_title" placeholder="e.g. The Auto Vault" />
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Image 1 — Location</label>
+          <input type="text" name="gal1_location" placeholder="e.g. Private Residence · Houston, TX" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Image 1 — Filename</label>
+          <input type="text" name="gal1_img" placeholder="e.g. gallery-1-garage.jpg" />
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Gallery Image 2 — Project Title</label>
+        <span class="field-hint">Wide card (top-right).</span>
+        <input type="text" name="gal2_title" placeholder="e.g. Subterranean Lounge" />
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Image 2 — Location</label>
+          <input type="text" name="gal2_location" placeholder="e.g. Residential Estate · Scottsdale, AZ" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Image 2 — Filename</label>
+          <input type="text" name="gal2_img" placeholder="e.g. gallery-2-basement.jpg" />
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Gallery Image 3 — Project Title</label>
+        <input type="text" name="gal3_title" placeholder="e.g. Culinary Environments" />
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Image 3 — Location</label>
+          <input type="text" name="gal3_location" placeholder="e.g. Private Chef's Residence · Nashville, TN" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Image 3 — Filename</label>
+          <input type="text" name="gal3_img" placeholder="e.g. gallery-3-kitchen.jpg" />
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Gallery Image 4 — Project Title</label>
+        <input type="text" name="gal4_title" placeholder="e.g. Outdoor Terraces" />
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Image 4 — Location</label>
+          <input type="text" name="gal4_location" placeholder="e.g. Luxury Estate · Malibu, CA" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Image 4 — Filename</label>
+          <input type="text" name="gal4_img" placeholder="e.g. gallery-4-patio.jpg" />
+        </div>
+      </div>
+
+      <div class="q-nav-row">
+        <button type="button" class="btn-back" onclick="goTo(4)"><span style="font-size:0.9em;">←</span> Back</button>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <span class="step-count">Step <strong>5</strong> of 6</span>
+          <button type="button" class="btn-next" onclick="goTo(6)">Next Section <span style="font-size:0.9em;">→</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────────────────────────────────────────────────── -->
+  <!-- SECTION 6 · Testimonials & Final Details                -->
+  <!-- ─────────────────────────────────────────────────────── -->
+  <section class="q-section" id="sec-6" data-section="6" data-label="Social Proof">
+    <div class="q-card">
+      <div class="section-num">06</div>
+      <div class="ornament">
+        <div class="ornament-line"></div>
+        <div class="ornament-diamond"></div>
+        <div class="ornament-line right"></div>
+      </div>
+      <div class="q-eyebrow">Section 06 — Social Proof &amp; Final Details</div>
+      <h2 class="q-heading">Your <em>Reputation.</em></h2>
+      <p class="q-subtext">Client testimonials and final branding details. These populate the testimonials section and the final CTA copy.</p>
+
+      <div class="field-group">
+        <label class="field-label">Featured Testimonial (Full Quote)</label>
+        <span class="field-hint">The hero quote displayed prominently in the testimonials section.</span>
+        <textarea name="test1_quote" placeholder="e.g. Working with them was unlike any contractor experience I've had..."></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Testimonial 1 — Name</label>
+          <input type="text" name="test1_name" placeholder="e.g. Marcus T." />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Testimonial 1 — Role / Project</label>
+          <input type="text" name="test1_role" placeholder="e.g. Private Collector · Dallas, TX" />
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label">Testimonial 2 (Short Quote)</label>
+        <textarea name="test2_quote" placeholder="A shorter secondary testimonial..." style="min-height: 80px;"></textarea>
+      </div>
+      <div class="field-row">
+        <div class="field-group">
+          <label class="field-label">Testimonial 2 — Name</label>
+          <input type="text" name="test2_name" placeholder="e.g. Renee &amp; Daniel F." />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Testimonial 2 — Role</label>
+          <input type="text" name="test2_role" placeholder="e.g. Architectural Clients · Miami, FL" />
+        </div>
+      </div>
+
+      <div class="field-divider"></div>
+
+      <div class="field-group">
+        <label class="field-label" for="cta-headline">CTA Headline</label>
+        <span class="field-hint">The large heading in the consultation CTA section. Can be a question or statement.</span>
+        <input type="text" id="cta-headline" name="cta_headline" placeholder="e.g. Reimagine Your Concrete." />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="cta-body">CTA Body Copy</label>
+        <span class="field-hint">2–3 sentences pitching your consultation offer.</span>
+        <textarea id="cta-body" name="cta_body" placeholder="We accept a limited number of projects each quarter..."></textarea>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Social Media Links</label>
+        <div class="field-row" style="margin-bottom: 0;">
+          <div class="field-group">
+            <input type="url" name="social_instagram" placeholder="Instagram URL" />
+          </div>
+          <div class="field-group">
+            <input type="url" name="social_facebook" placeholder="Facebook URL" />
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Anything Else We Should Know?</label>
+        <span class="field-hint">Awards, unique differentiators, brand voice notes, or anything that didn't fit above.</span>
+        <textarea name="misc_notes" placeholder="e.g. We specialize exclusively in residential estates over 3,000 sq ft..."></textarea>
+      </div>
+
+      <div class="q-nav-row">
+        <button type="button" class="btn-back" onclick="goTo(5)"><span style="font-size:0.9em;">←</span> Back</button>
+        <div style="display: flex; align-items: center; gap: 1.5rem;">
+          <span class="step-count">Step <strong>6</strong> of 6</span>
+          <button type="button" class="btn-submit" onclick="handleSubmit()">Generate Summary ✦</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</form>
+
+<!-- SUCCESS / SUMMARY SCREEN -->
+<section id="success-screen" style="display: none; flex-direction: column; min-height: 60vh; align-items: center; justify-content: center; padding: 6rem 2rem; text-align: center;">
+  <div class="success-check">✦</div>
+  <h2 class="success-heading" style="margin-top: 1.5rem;">Questionnaire <em>Complete.</em></h2>
+  <p style="font-size: 0.72rem; font-weight: 300; line-height: 2; color: var(--mist-dim); max-width: 480px; margin: 1rem auto 2rem;">
+    Your answers have been compiled below. Copy this summary and send it alongside your image files — we'll have your site updated and ready for review.
+  </p>
+  <button class="btn-copy" onclick="copySummary()">Copy Full Summary to Clipboard</button>
+</section>
+
+<div id="summary-output" style="display: none; max-width: 780px; margin: 0 auto 5rem; padding: 2.5rem 3rem; background: var(--charcoal-card); border: 1px solid rgba(212,175,55,0.15);">
+  <div id="summary-text" style="font-size: 0.7rem; line-height: 2; letter-spacing: 0.04em; color: var(--mist); white-space: pre-wrap; font-family: 'Montserrat', sans-serif;"></div>
+</div>
+
+</main>
+
+<script>
+// ── Cursor ────────────────────────────────────────────────────────────────────
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+});
+(function animRing() {
+  rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+  cursorRing.style.left = rx + 'px'; cursorRing.style.top = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+document.querySelectorAll('a,button,input,select,textarea,.pill-label').forEach(el => {
+  el.addEventListener('mouseenter', () => cursorRing.classList.add('expand'));
+  el.addEventListener('mouseleave', () => cursorRing.classList.remove('expand'));
+});
+
+// ── Section Config ────────────────────────────────────────────────────────────
+const TOTAL = 6;
+const labels = ['Identity','Services','Credentials','Process','Gallery','Social Proof'];
+
+// Build step dots
+const stepNav = document.getElementById('step-nav');
+labels.forEach((label, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'step-dot';
+  dot.setAttribute('data-index', i + 1);
+  dot.title = label;
+  const lbl = document.createElement('span');
+  lbl.className = 'step-dot-label';
+  lbl.textContent = label;
+  dot.appendChild(lbl);
+  dot.addEventListener('click', () => goTo(i + 1));
+  stepNav.appendChild(dot);
+});
+
+function updateDots(active) {
+  document.querySelectorAll('.step-dot').forEach((dot, i) => {
+    dot.classList.remove('active','done');
+    const idx = i + 1;
+    if (idx === active) dot.classList.add('active');
+    else if (idx < active) dot.classList.add('done');
+  });
+}
+
+function updateProgress(step) {
+  const pct = ((step - 1) / (TOTAL - 1)) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ── Navigation ────────────────────────────────────────────────────────────────
+function goTo(n) {
+  const target = document.getElementById('sec-' + n);
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  updateDots(n);
+  updateProgress(n);
+}
+
+// Auto-update dots on scroll
+const sections = document.querySelectorAll('.q-section');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const n = parseInt(entry.target.getAttribute('data-section'));
+      updateDots(n);
+      updateProgress(n);
+    }
+  });
+}, { threshold: 0.5 });
+sections.forEach(s => observer.observe(s));
+
+// Init
+updateDots(1);
+updateProgress(1);
+
+// ── Submit & Summary Generation ───────────────────────────────────────────────
+function val(name) {
+  const el = document.querySelector('[name="' + name + '"]');
+  return el ? el.value.trim() : '';
+}
+
+function checked(name) {
+  return Array.from(document.querySelectorAll('[name="' + name + '"]:checked'))
+    .map(el => el.value).join(', ');
+}
+
+function handleSubmit() {
+  const summary = buildSummary();
+  document.getElementById('q-form').style.display = 'none';
+  document.getElementById('step-nav').style.display = 'none';
+
+  const successEl = document.getElementById('success-screen');
+  successEl.style.display = 'flex';
+
+  const summaryWrap = document.getElementById('summary-output');
+  document.getElementById('summary-text').textContent = summary;
+  summaryWrap.style.display = 'block';
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  // Store for copy
+  window._summary = summary;
+}
+
+function buildSummary() {
+  const hr = '─'.repeat(52);
+  const lines = [];
+
+  lines.push('AURA RESIN & STONE — WEBSITE CONTENT SUMMARY');
+  lines.push('Generated: ' + new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }));
+  lines.push(hr);
+  lines.push('');
+
+  lines.push('■ SECTION 1 — BUSINESS IDENTITY');
+  lines.push('Business Name:     ' + (val('biz_name') || '[not provided]'));
+  lines.push('Year Founded:      ' + (val('biz_year') || '[not provided]'));
+  lines.push('Tagline:           ' + (val('biz_tagline') || '[not provided]'));
+  lines.push('Phone:             ' + (val('biz_phone') || '[not provided]'));
+  lines.push('Email:             ' + (val('biz_email') || '[not provided]'));
+  lines.push('Website:           ' + (val('biz_website') || '[none]'));
+  lines.push('');
+  lines.push('Brand Description:');
+  lines.push(val('biz_description') || '[not provided]');
+  lines.push('');
+  lines.push(hr);
+  lines.push('');
+
+  lines.push('■ SECTION 2 — SERVICES');
+  lines.push('Services Checked:  ' + (checked('svc[]') || '[none selected]'));
+  lines.push('');
+  lines.push('Service Card 1:    ' + (val('svc1_title') || '[not provided]'));
+  lines.push(val('svc1_desc') || '[no description]');
+  lines.push('');
+  lines.push('Service Card 2:    ' + (val('svc2_title') || '[not provided]'));
+  lines.push(val('svc2_desc') || '[no description]');
+  lines.push('');
+  lines.push('Service Card 3:    ' + (val('svc3_title') || '[not provided]'));
+  lines.push(val('svc3_desc') || '[no description]');
+  lines.push('');
+  lines.push(hr);
+  lines.push('');
+
+  lines.push('■ SECTION 3 — CREDENTIALS & STATS');
+  lines.push('Projects Completed: ' + (val('stat_projects') || '[not provided]'));
+  lines.push('Years in Business:  ' + (val('stat_years') || '[not provided]'));
+  lines.push('Warranty:           ' + (val('stat_warranty') || '[not provided]'));
+  lines.push('Satisfaction:       ' + (val('stat_satisfaction') || '[not provided]'));
+  lines.push('Certifications:     ' + (checked('cert[]') || '[none selected]'));
+  lines.push('Service Area:       ' + (val('service_area') || '[not provided]'));
+  lines.push('');
+  lines.push(hr);
+  lines.push('');
+
+  lines.push('■ SECTION 4 — INSTALLATION PROCESS');
+  lines.push('Step 1: ' + (val('step1_title') || '[not provided]'));
+  lines.push(val('step1_desc') || '[no description]');
+  lines.push('');
+  lines.push('Step 2: ' + (val('step2_title') || '[not provided]'));
+  lines.push(val('step2_desc') || '[no description]');
+  lines.push('');
+  lines.push('Step 3: ' + (val('step3_title') || '[not provided]'));
+  lines.push(val('step3_desc') || '[no description]');
+  lines.push('');
+  lines.push('Step 4: ' + (val('step4_title') || '[not provided]'));
+  lines.push(val('step4_desc') || '[no description]');
+  lines.push('');
+  lines.push(hr);
+  lines.push('');
+
+  lines.push('■ SECTION 5 — GALLERY / PORTFOLIO');
+  lines.push('Gallery 1: ' + (val('gal1_title') || '[not provided]'));
+  lines.push('  Location: ' + (val('gal1_location') || '[not provided]'));
+  lines.push('  Image file: ' + (val('gal1_img') || '[not provided]'));
+  lines.push('');
+  lines.push('Gallery 2: ' + (val('gal2_title') || '[not provided]'));
+  lines.push('  Location: ' + (val('gal2_location') || '[not provided]'));
+  lines.push('  Image file: ' + (val('gal2_img') || '[not provided]'));
+  lines.push('');
+  lines.push('Gallery 3: ' + (val('gal3_title') || '[not provided]'));
+  lines.push('  Location: ' + (val('gal3_location') || '[not provided]'));
+  lines.push('  Image file: ' + (val('gal3_img') || '[not provided]'));
+  lines.push('');
+  lines.push('Gallery 4: ' + (val('gal4_title') || '[not provided]'));
+  lines.push('  Location: ' + (val('gal4_location') || '[not provided]'));
+  lines.push('  Image file: ' + (val('gal4_img') || '[not provided]'));
+  lines.push('');
+  lines.push(hr);
+  lines.push('');
+
+  lines.push('■ SECTION 6 — SOCIAL PROOF & FINAL CTA');
+  lines.push('Featured Testimonial:');
+  lines.push('"' + (val('test1_quote') || '[not provided]') + '"');
+  lines.push('  — ' + (val('test1_name') || '[name]') + ' · ' + (val('test1_role') || '[role]'));
+  lines.push('');
+  lines.push('Secondary Testimonial:');
+  lines.push('"' + (val('test2_quote') || '[not provided]') + '"');
+  lines.push('  — ' + (val('test2_name') || '[name]') + ' · ' + (val('test2_role') || '[role]'));
+  lines.push('');
+  lines.push('CTA Headline:  ' + (val('cta_headline') || '[not provided]'));
+  lines.push('CTA Body:');
+  lines.push(val('cta_body') || '[not provided]');
+  lines.push('');
+  lines.push('Instagram: ' + (val('social_instagram') || '[not provided]'));
+  lines.push('Facebook:  ' + (val('social_facebook') || '[not provided]'));
+  lines.push('');
+  lines.push('Additional Notes:');
+  lines.push(val('misc_notes') || '[none]');
+  lines.push('');
+  lines.push(hr);
+  lines.push('END OF QUESTIONNAIRE SUMMARY');
+
+  return lines.join('\n');
+}
+
+function copySummary() {
+  if (!window._summary) return;
+  navigator.clipboard.writeText(window._summary).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied ✓';
+    btn.style.background = 'var(--gold-dim)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = ''; }, 2200);
+  });
+}
+</script>
+</body>
+</html>
